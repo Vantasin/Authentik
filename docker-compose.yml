@@ -4,6 +4,8 @@ services:
   postgresql:
     image: docker.io/library/postgres:16-alpine
     restart: unless-stopped
+    networks:
+      - authentik_internal
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
       start_period: 20s
@@ -11,7 +13,7 @@ services:
       retries: 5
       timeout: 5s
     volumes:
-      - database:/var/lib/postgresql/data
+      - ${AUTHENTIK_DATA_VOLUME}/database:/var/lib/postgresql/data
     environment:
       POSTGRES_PASSWORD: ${PG_PASS:?database password required}
       POSTGRES_USER: ${PG_USER:-authentik}
@@ -22,6 +24,8 @@ services:
     image: docker.io/library/redis:alpine
     command: --save 60 1 --loglevel warning
     restart: unless-stopped
+    networks:
+      - authentik_internal
     healthcheck:
       test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
       start_period: 20s
@@ -29,10 +33,13 @@ services:
       retries: 5
       timeout: 3s
     volumes:
-      - redis:/data
+      - ${AUTHENTIK_DATA_VOLUME}/redis:/data
   server:
     image: ${AUTHENTIK_IMAGE:-ghcr.io/goauthentik/server}:${AUTHENTIK_TAG:-2025.6.4}
     restart: unless-stopped
+    networks:
+      - npm_proxy
+      - authentik_internal
     command: server
     environment:
       AUTHENTIK_SECRET_KEY: ${AUTHENTIK_SECRET_KEY:?secret key required}
@@ -42,13 +49,10 @@ services:
       AUTHENTIK_POSTGRESQL__NAME: ${PG_DB:-authentik}
       AUTHENTIK_POSTGRESQL__PASSWORD: ${PG_PASS}
     volumes:
-      - ./media:/media
-      - ./custom-templates:/templates
+      - ${AUTHENTIK_DATA_VOLUME}/media:/media
+      - ${AUTHENTIK_DATA_VOLUME}/custom-templates:/templates
     env_file:
       - .env
-    ports:
-      - "${COMPOSE_PORT_HTTP:-9000}:9000"
-      - "${COMPOSE_PORT_HTTPS:-9443}:9443"
     depends_on:
       postgresql:
         condition: service_healthy
@@ -57,6 +61,9 @@ services:
   worker:
     image: ${AUTHENTIK_IMAGE:-ghcr.io/goauthentik/server}:${AUTHENTIK_TAG:-2025.6.4}
     restart: unless-stopped
+    networks:
+      - npm_proxy
+      - authentik_internal
     command: worker
     environment:
       AUTHENTIK_SECRET_KEY: ${AUTHENTIK_SECRET_KEY:?secret key required}
@@ -74,9 +81,9 @@ services:
     user: root
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - ./media:/media
-      - ./certs:/certs
-      - ./custom-templates:/templates
+      - ${AUTHENTIK_DATA_VOLUME}/media:/media
+      - ${AUTHENTIK_DATA_VOLUME}/certs:/certs
+      - ${AUTHENTIK_DATA_VOLUME}/custom-templates:/templates
     env_file:
       - .env
     depends_on:
@@ -85,8 +92,8 @@ services:
       redis:
         condition: service_healthy
 
-volumes:
-  database:
-    driver: local
-  redis:
-    driver: local
+networks:
+  npm_proxy:
+    external: true
+  authentik_internal:
+    driver: bridge
