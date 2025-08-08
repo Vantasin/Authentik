@@ -9,7 +9,6 @@
 # Ignore local Docker volumes (if mapped inside repo)
 data/
 volumes/
-grafana-storage/
 
 # Ignore editor/IDE metadata
 .vscode/

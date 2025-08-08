@@ -36,6 +36,7 @@ services:
       - ${AUTHENTIK_DATA_VOLUME}/redis:/data
   server:
     image: ${AUTHENTIK_IMAGE:-ghcr.io/goauthentik/server}:${AUTHENTIK_TAG:-2025.6.4}
+    container_name: authentik_server
     restart: unless-stopped
     networks:
       - npm_proxy
