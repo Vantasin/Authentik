@@ -84,8 +84,8 @@ tank/
 	> Run the following commands to generate a password and secret key and write them to your .env file:
 
 	```bash
-	echo "PG_PASS=$(openssl rand -base64 36 | tr -d '\n')" >> .env
-	echo "AUTHENTIK_SECRET_KEY=$(openssl rand -base64 60 | tr -d '\n')" >> .env
+	sudo echo "PG_PASS=$(openssl rand -base64 36 | tr -d '\n')" >> .env
+	sudo echo "AUTHENTIK_SECRET_KEY=$(openssl rand -base64 60 | tr -d '\n')" >> .env
 	```
 
 
