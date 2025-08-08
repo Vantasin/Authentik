@@ -104,10 +104,8 @@ tank/
 
 Once deployed, access **Authentik** using:
 
-- **Web Interface:** Enter the URL for **Authentik**. Eg. `https://authentik.example.com`.
+- **Web Interface:** You must create a URL `https://authentik.example.com` using [Nginx Proxy Manager](https://github.com/Vantasin/Nginx-Proxy-Manager.git) as a reverse proxy for HTTPS certificates via Let's Encrypt.
 
-   > **Tip:** You must create a URL `https://authentik.example.com` using [Nginx Proxy Manager](https://github.com/Vantasin/Nginx-Proxy-Manager.git) as a reverse proxy for HTTPS certificates via Let's Encrypt.
-   >
    > **Proxy Host:**
    >  - **Domain Name:** `https://authentik.example.com`
    >  - **Scheme:** `http`
@@ -119,7 +117,7 @@ Once deployed, access **Authentik** using:
    >  - From the **Certificate** dropdown select your `*.example.com` certificate
    >  - Enable **Force SSL** to redirect all HTTP → HTTPS
 
-- **Initial Setup:** When you first access the web interface, you will be prompted to create an admin account.
+- **Initial Setup:** To start the initial setup, navigate to `https://authentik.example.com/if/flow/initial-setup/`. When you first access the web interface, you will be prompted to create an admin account.
 
 ---
 
