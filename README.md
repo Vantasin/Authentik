@@ -32,8 +32,8 @@ tank/
 * Docker Engine
 * Docker Compose V2
 * Git
+* Openssl for secure password generation
 * (Optional) ZFS on Linux for dataset management
-* (Optional) openssl for secure password generation
 
 > ⚠️ **Note:** These instructions assume your ZFS pool is named `tank`. If your pool has a different name (e.g., `rpool`, `zdata`, etc.), replace `tank` in all paths and commands with your actual pool name.
 
@@ -80,11 +80,14 @@ tank/
    ```
    
 	> **Note:**
-	> Use a secure password generator of your choice such as `openssl`.
-	> Run the following commands to generate a password and secret key and write them to your .env file:
+	> Run the following command to generate a secure password and secret key using `openssl` and write them to your .env file:
 
 	```bash
+	echo "" | sudo tee -a .env > /dev/null
+	echo "# Auto-generated Postgres password" | sudo tee -a .env > /dev/null
 	echo "PG_PASS=$(openssl rand -base64 36 | tr -d '\n')" | sudo tee -a .env > /dev/null
+	echo "" | sudo tee -a .env > /dev/null
+	echo "# Auto-generated Authentik secret key" | sudo tee -a .env > /dev/null
 	echo "AUTHENTIK_SECRET_KEY=$(openssl rand -base64 60 | tr -d '\n')" | sudo tee -a .env > /dev/null
 	```
 
